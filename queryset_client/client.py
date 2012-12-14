@@ -661,7 +661,7 @@ def model_gen(**configs):
             if hasattr(self, "id"):
                 self._client(self.id).put(self._get_fields())  # return bool
             else:
-                self._setattrs(**self._client.post(self._get_fields()))
+                self._client.post(self._get_fields())
 
         def delete(self):
             """ delete
