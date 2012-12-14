@@ -539,10 +539,10 @@ def model_gen(**configs):
 
         def _setattrs(self, **kwargs):
             for field in kwargs:
+                self.__setattr__(field, kwargs[field])
                 if not field in self._fields and self._strict_field:
                     raise FieldTypeError("'{0}' is an invalid keyword argument for this function"
                                          .format(field))
-                self.__setattr__(field, kwargs[field])
 
         def __setattr__(self, attr, value):
             self._setfield(attr, value)
