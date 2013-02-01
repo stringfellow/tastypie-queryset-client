@@ -487,14 +487,14 @@ class Response(object):
                 self.model = self.model(**self.__response)
         return self.__response
 
-    def save(self):
+    def save(self, uri_key_field='id'):
         """ save saved response """
-        self.model.save()
+        self.model.save(uri_key_field)
         self.__response = self.model._get_fields()
 
-    def delete(self):
+    def delete(self, uri_key_field='id'):
         """ remove saved response """
-        self.model.delete()
+        self.model.delete(uri_key_field)
         self.__response = dict()
 
 
@@ -662,24 +662,27 @@ def model_gen(**configs):
             else:
                 return cls._schema_store
 
-        def save(self):
+        def save(self, uri_key_field="id"):
             """ save
-
+            :param uri_key_field: defaults to id but replace with (e.g. slug)
+                if you don't fetch things by id.
             :rtype: NoneType
             """
-            if hasattr(self, "id"):
-                self._client(self.id).put(self._get_fields())  # return bool
+            if hasattr(self, uri_key_field):
+                self._client(getattr(self, uri_key_field)).put(self._get_fields())  # return bool
             else:
                 self._setattrs(**self._client.post(self._get_fields()))
 
-        def delete(self):
+        def delete(self, uri_key_field="id"):
             """ delete
 
+            :param uri_key_field: defaults to id but replace with (e.g. slug)
+                if you don't fetch things by id.
             :rtype: NoneType
             """
-            assert hasattr(self, "id") is True, "{0} object can't be deleted because its {2} attribute \
-                is set to None.".format(self._model_name, self._schema_store["fields"]["id"]["type"])
-            self._client(self.id).delete()
+            assert hasattr(self, uri_key_field) is True, "{0} object can't be deleted because its {2} attribute \
+                is set to None.".format(self._model_name, self._schema_store["fields"][uri_key_field]["type"])
+            self._client(getattr(self, uri_key_field)).delete()
             self._clear_fields()
 
     Model.objects = configs.get("objects", Manager(Model))
